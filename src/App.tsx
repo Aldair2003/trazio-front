@@ -18,7 +18,7 @@ import ProjectsPage from '@/pages/ProjectsPage'
 import OnboardingPageV2 from '@/pages/OnboardingPageV2'
 import SettingsPage from '@/pages/SettingsPage'
 import MisMateriasPage from '@/pages/MisMateriasPage'
-import RecursosPage from '@/pages/RecursosPage'
+// import RecursosPage from '@/pages/RecursosPage'
 import MisClasesPage from '@/pages/MisClasesPage'
 
 // Layout
@@ -173,7 +173,7 @@ function App() {
           
           {/* Rutas para estudiantes */}
           <Route path="/mis-materias" element={<MisMateriasPage />} />
-          <Route path="/recursos" element={<RecursosPage />} />
+          {/* <Route path="/recursos" element={<RecursosPage />} /> */}
           
           {/* Rutas para docentes */}
           <Route path="/mis-clases" element={<MisClasesPage />} />

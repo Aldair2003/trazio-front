@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { postService } from '@/services/postService'
 import PostCard from '@/components/posts/PostCard'
 import CreatePostDialog from '@/components/posts/CreatePostDialog'
-import { Loader2, Search, Hash, Filter, MessageSquare, Calendar, ClipboardList, FolderOpen, FileText, Sparkles } from 'lucide-react'
+import { Loader2, Search, Hash, Filter, MessageSquare, Calendar, ClipboardList, FolderOpen, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { PostType } from '@/types'
 import { useState } from 'react'
@@ -41,7 +41,7 @@ export default function FeedPage() {
     { value: PostType.EXAM, label: 'Exámenes', icon: Calendar },
     { value: PostType.ASSIGNMENT, label: 'Tareas', icon: ClipboardList },
     { value: PostType.PROJECT, label: 'Proyectos', icon: FolderOpen },
-    { value: PostType.RESOURCE, label: 'Recursos', icon: FileText },
+    // { value: PostType.RESOURCE, label: 'Recursos', icon: FileText },
   ]
 
   return (

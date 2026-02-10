@@ -8,11 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { 
   BookOpen, 
-  Calendar, 
-  ClipboardList, 
-  FolderOpen, 
-  User, 
-  Plus,
+  User,
   ChevronRight,
   GraduationCap
 } from 'lucide-react'
@@ -129,45 +125,6 @@ export default function MisMateriasPage() {
           ))}
         </div>
       )}
-
-      {/* Leyenda de acciones rápidas */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-none">
-        <CardContent className="py-6">
-          <h3 className="font-semibold mb-4 flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            ¿Qué puedes documentar?
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">Exámenes</p>
-                <p className="text-xs text-muted-foreground">Documenta tus parciales</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
-              <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <ClipboardList className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">Tareas</p>
-                <p className="text-xs text-muted-foreground">Registra tus entregas</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <FolderOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">Proyectos</p>
-                <p className="text-xs text-muted-foreground">Muestra tu trabajo</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
@@ -213,33 +170,11 @@ function SubjectCard({ relation }: SubjectCardProps) {
           </div>
         )}
 
-        {/* Acciones rápidas */}
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to={`/exams?curriculumSubjectId=${relation.curriculumSubjectId}`}>
-              <Calendar className="h-4 w-4 mr-1" />
-              Exámenes
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link to={`/assignments?curriculumSubjectId=${relation.curriculumSubjectId}`}>
-              <ClipboardList className="h-4 w-4 mr-1" />
-              Tareas
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link to={`/projects?curriculumSubjectId=${relation.curriculumSubjectId}`}>
-              <FolderOpen className="h-4 w-4 mr-1" />
-              Proyectos
-            </Link>
-          </Button>
-        </div>
-
         {/* Ver más */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="w-full mt-3 group-hover:bg-primary/10"
+          className="w-full group-hover:bg-primary/10"
           asChild
         >
           <Link to={`/feed?curriculumSubjectId=${relation.curriculumSubjectId}`}>

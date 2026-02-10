@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { useQuery } from '@tanstack/react-query'
 import { hashtagService } from '@/services/hashtagService'
-import { Hash, TrendingUp, Info } from 'lucide-react'
+import { Hash, TrendingUp, Info, Calendar, ClipboardList, FolderOpen } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -15,6 +16,51 @@ export default function Sidebar() {
 
   return (
     <div className="space-y-3">
+      {/* Acciones Rápidas - Repositorios */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-2 pt-3 px-4">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <FolderOpen className="h-4 w-4 text-primary" />
+            Mi Repositorio
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-3 space-y-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start h-9"
+            asChild
+          >
+            <Link to="/exams">
+              <Calendar className="h-4 w-4 mr-2" />
+              Exámenes
+            </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start h-9"
+            asChild
+          >
+            <Link to="/assignments">
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Tareas
+            </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start h-9"
+            asChild
+          >
+            <Link to="/projects">
+              <FolderOpen className="h-4 w-4 mr-2" />
+              Proyectos
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Hashtags Populares - Más compacto */}
       <Card className="shadow-sm">
         <CardHeader className="pb-2 pt-3 px-4">

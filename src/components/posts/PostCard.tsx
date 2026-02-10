@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, Hash, Trash2, Heart, Download, FileText, Star, Calendar, ClipboardList, FolderOpen, MessageSquare } from 'lucide-react'
+import { MessageCircle, Hash, Trash2, Heart, Download, FileText, Star, Calendar, ClipboardList, FolderOpen, MessageSquare, Github, Globe, Code, Users } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { timeAgo } from '@/lib/utils'
-import type { Post, FileType } from '@/types'
+import type { Post, FileType, FileAttachment } from '@/types'
 import { UserRole } from '@/types'
 import { useAuthStore } from '@/stores/authStore'
 import CommentSection from './CommentSection'
@@ -308,6 +308,336 @@ export default function PostCard({ post }: PostCardProps) {
 
       <CardContent>
         <p className="text-sm whitespace-pre-wrap">{post.content}</p>
+
+        {/* Información detallada del proyecto */}
+        {post.type === 'project' && post.linkedEntity && 'technologies' in post.linkedEntity && (
+          <div className="mt-4 p-4 border rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+            <div className="space-y-3">
+              {/* Título del proyecto */}
+              <h3 className="font-semibold text-lg text-purple-900 dark:text-purple-100">
+                {post.linkedEntity.title}
+              </h3>
+
+              {/* Descripción */}
+              {post.linkedEntity.description && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {post.linkedEntity.description}
+                </p>
+              )}
+
+              {/* Tecnologías */}
+              {post.linkedEntity.technologies && post.linkedEntity.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  <Code className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5" />
+                  {post.linkedEntity.technologies.map((tech: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Fecha de entrega */}
+              {'dueDate' in post.linkedEntity && post.linkedEntity.dueDate && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>Fecha de entrega: {new Date(post.linkedEntity.dueDate).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</span>
+                </div>
+              )}
+
+              {/* Enlaces del proyecto */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                {post.linkedEntity.repositoryUrl && (
+                  <a
+                    href={post.linkedEntity.repositoryUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm transition-colors"
+                  >
+                    <Github className="h-4 w-4" />
+                    Repositorio
+                  </a>
+                )}
+                
+                {post.linkedEntity.demoUrl && (
+                  <a
+                    href={post.linkedEntity.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors"
+                  >
+                    <Globe className="h-4 w-4" />
+                    Ver Demo
+                  </a>
+                )}
+              </div>
+
+              {/* Colaboradores si existen */}
+              {post.linkedEntity.collaborators && post.linkedEntity.collaborators.length > 0 && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 border-t">
+                  <Users className="h-4 w-4" />
+                  <span>Colaboradores: {post.linkedEntity.collaborators.length}</span>
+                </div>
+              )}
+
+              {/* Archivos adjuntos del proyecto */}
+              {post.linkedEntity.attachments && post.linkedEntity.attachments.length > 0 && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Archivos adjuntos:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {post.linkedEntity.attachments.map((attachment: FileAttachment, index: number) => (
+                      <div key={index} className="relative group bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden border">
+                        {/* Previsualización según tipo */}
+                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                          {attachment.fileType === 'image' ? (
+                            <img
+                              src={attachment.url}
+                              alt={attachment.fileName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const parent = e.currentTarget.parentElement
+                                if (parent) {
+                                  parent.innerHTML = `
+                                    <div class="flex flex-col items-center justify-center p-3">
+                                      <svg class="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      <p class="text-xs text-gray-500">Imagen</p>
+                                    </div>
+                                  `
+                                }
+                              }}
+                            />
+                          ) : attachment.fileType === 'video' ? (
+                            <div className="relative w-full h-full">
+                              <video
+                                src={attachment.url}
+                                className="w-full h-full object-cover"
+                              preload="metadata"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                              <div className="p-2 bg-white/90 dark:bg-gray-900/90 rounded-full">
+                                <FileText className="h-5 w-5 text-purple-600" />
+                              </div>
+                            </div>
+                          </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-3 h-full">
+                              <FileText className="h-8 w-8 text-purple-600 mb-2" />
+                              <p className="text-xs text-gray-600 dark:text-gray-400 text-center font-medium">{attachment.fileName}</p>
+                            </div>
+                          )}
+                        </div>                        {/* Info y botón de descarga */}
+                        <div className="p-2 bg-white dark:bg-gray-800">
+                          <p className="text-xs font-medium truncate mb-1">{attachment.fileName || `Archivo ${index + 1}`}</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-7 text-xs"
+                            onClick={() => handleDownload(attachment.url, attachment.fileName)}
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Información detallada del examen */}
+        {post.type === 'exam' && post.linkedEntity && (
+          <div className="mt-4 p-4 border rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-800/20">
+            <div className="space-y-3">
+              {/* Título del examen */}
+              <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
+                {post.linkedEntity.title}
+              </h3>
+
+              {/* Descripción */}
+              {post.linkedEntity.description && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {post.linkedEntity.description}
+                </p>
+              )}
+
+              {/* Fecha del examen */}
+              {'date' in post.linkedEntity && post.linkedEntity.date && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>Fecha del examen: {new Date(post.linkedEntity.date).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</span>
+                </div>
+              )}
+
+              {/* Archivos adjuntos del examen */}
+              {post.linkedEntity.attachments && post.linkedEntity.attachments.length > 0 && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Archivos adjuntos:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {post.linkedEntity.attachments.map((attachment: FileAttachment, index: number) => (
+                      <div key={index} className="relative group bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden border">
+                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                          {attachment.fileType === 'image' ? (
+                            <img
+                              src={attachment.url}
+                              alt={attachment.fileName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const parent = e.currentTarget.parentElement
+                                if (parent) {
+                                  parent.innerHTML = `
+                                    <div class="flex flex-col items-center justify-center p-3">
+                                      <svg class="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      <p class="text-xs text-gray-500">Imagen</p>
+                                    </div>
+                                  `
+                                }
+                              }}
+                            />
+                          ) : attachment.fileType === 'video' ? (
+                            <video 
+                              src={attachment.url} 
+                              className="w-full h-full object-cover rounded" 
+                              controls
+                              preload="metadata"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-3 h-full">
+                              <FileText className="h-8 w-8 text-blue-600 mb-2" />
+                              <p className="text-xs text-gray-600 dark:text-gray-400 text-center font-medium px-1 line-clamp-2">{attachment.fileName}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-white dark:bg-gray-800">
+                          <p className="text-xs font-medium truncate mb-1">{attachment.fileName || `Archivo ${index + 1}`}</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-7 text-xs"
+                            onClick={() => handleDownload(attachment.url, attachment.fileName)}
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Información detallada de la tarea */}
+        {post.type === 'assignment' && post.linkedEntity && (
+          <div className="mt-4 p-4 border rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-800/20">
+            <div className="space-y-3">
+              {/* Título de la tarea */}
+              <h3 className="font-semibold text-lg text-green-900 dark:text-green-100">
+                {post.linkedEntity.title}
+              </h3>
+
+              {/* Descripción */}
+              {post.linkedEntity.description && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {post.linkedEntity.description}
+                </p>
+              )}
+
+              {/* Fecha de entrega */}
+              {'dueDate' in post.linkedEntity && post.linkedEntity.dueDate && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>Fecha de entrega: {new Date(post.linkedEntity.dueDate).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</span>
+                </div>
+              )}
+
+              {/* Archivos adjuntos de la tarea */}
+              {post.linkedEntity.attachments && post.linkedEntity.attachments.length > 0 && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Archivos adjuntos:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {post.linkedEntity.attachments.map((attachment: FileAttachment, index: number) => (
+                      <div key={index} className="relative group bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden border">
+                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                          {attachment.fileType === 'image' ? (
+                            <img
+                              src={attachment.url}
+                              alt={attachment.fileName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const parent = e.currentTarget.parentElement
+                                if (parent) {
+                                  parent.innerHTML = `
+                                    <div class="flex flex-col items-center justify-center p-3">
+                                      <svg class="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      <p class="text-xs text-gray-500">Imagen</p>
+                                    </div>
+                                  `
+                                }
+                              }}
+                            />
+                          ) : attachment.fileType === 'video' ? (
+                            <video 
+                              src={attachment.url} 
+                              className="w-full h-full object-cover rounded" 
+                              controls
+                              preload="metadata"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-3 h-full">
+                              <FileText className="h-8 w-8 text-green-600 mb-2" />
+                              <p className="text-xs text-gray-600 dark:text-gray-400 text-center font-medium px-1 line-clamp-2">{attachment.fileName}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-white dark:bg-gray-800">
+                          <p className="text-xs font-medium truncate mb-1">{attachment.fileName || `Archivo ${index + 1}`}</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-7 text-xs"
+                            onClick={() => handleDownload(attachment.url, attachment.fileName)}
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {post.filePath && (
           <div className="mt-4">

@@ -526,10 +526,11 @@ export default function ProfilePage() {
             <CreatePostDialog />
           )}
 
+          <Card className="p-4">
           <Tabs defaultValue="posts" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 h-9">
-              <TabsTrigger value="posts" className="text-sm">Publicaciones</TabsTrigger>
-              <TabsTrigger value="repository" className="text-sm">Repositorio Académico</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="posts">Publicaciones</TabsTrigger>
+                <TabsTrigger value="repository">Repositorio Académico</TabsTrigger>
             </TabsList>
 
             <TabsContent value="posts" className="space-y-3 mt-4">
@@ -725,6 +726,7 @@ export default function ProfilePage() {
               </Card>
             </TabsContent>
       </Tabs>
+          </Card>
         </div>
       </div>
     </div>

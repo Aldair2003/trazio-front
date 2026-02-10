@@ -167,6 +167,7 @@ export interface Post {
   content: string
   type: PostType
   linkedEntityId?: number
+  linkedEntity?: Project | Assignment | Exam // La entidad vinculada (proyecto, tarea o examen)
   curriculumSubjectId?: number
   filePath?: string
   fileType?: FileType
@@ -180,6 +181,7 @@ export interface Post {
   highlights?: Highlight[]
   highlightsCount?: number
   curriculumSubject?: CurriculumSubject
+  subject?: CurriculumSubject // Alias para compatibilidad
 }
 
 // Comment Types

@@ -1,6 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { 
-  Home, 
   Search, 
   User, 
   LogOut, 
@@ -9,7 +8,6 @@ import {
   Bell,
   Settings,
   GraduationCap,
-  FileText,
   Users
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -67,24 +65,18 @@ export default function Navbar() {
 
   // Navegación basada en el rol del usuario
   const getNavLinks = () => {
-    const commonLinks = [
-      { path: '/feed', icon: Home, label: 'Feed' },
-    ]
-    
     if (user?.role === UserRole.STUDENT) {
       return [
-        ...commonLinks,
         { path: '/mis-materias', icon: BookOpen, label: 'Mis Materias' },
-        { path: '/recursos', icon: FileText, label: 'Recursos' },
+        // { path: '/recursos', icon: FileText, label: 'Recursos' },
       ]
     } else if (user?.role === UserRole.TEACHER) {
       return [
-        ...commonLinks,
         { path: '/mis-clases', icon: GraduationCap, label: 'Mis Clases' },
       ]
     }
     
-    return commonLinks
+    return []
   }
 
   const navLinks = getNavLinks()
@@ -126,50 +118,64 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
-            <TooltipProvider>
-              {navLinks.map((link) => {
-                const Icon = link.icon
-                const active = isActive(link.path)
-                
-                return (
-                  <Tooltip key={link.path}>
+          {/* Right Section - Navigation + Notifications + Profile */}
+          {user && (
+            <div className="flex items-center gap-1">
+              {/* Desktop Navigation */}
+              <div className="hidden lg:flex items-center gap-1">
+                <TooltipProvider>
+                  {navLinks.map((link) => {
+                    const Icon = link.icon
+                    const active = isActive(link.path)
+                    
+                    return (
+                      <Tooltip key={link.path}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={active ? "default" : "ghost"}
+                            size="icon"
+                            asChild
+                            className={cn(
+                              "relative transition-all",
+                              active && "shadow-md"
+                            )}
+                          >
+                            <Link to={link.path}>
+                              <Icon className="h-5 w-5" />
+                              {active && (
+                                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
+                              )}
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{link.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                  
+                  {/* Notifications */}
+                  <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button
-                        variant={active ? "default" : "ghost"}
-                        size="icon"
-                        asChild
-                        className={cn(
-                          "relative transition-all",
-                          active && "shadow-md"
-                        )}
-                      >
-                        <Link to={link.path}>
-                          <Icon className="h-5 w-5" />
-                          {active && (
-                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
-                          )}
-                        </Link>
+                      <Button variant="ghost" size="icon" className="relative">
+                        <Bell className="h-5 w-5" />
+                        {/* Badge de notificaciones */}
+                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{link.label}</p>
+                      <p>Notificaciones</p>
                     </TooltipContent>
                   </Tooltip>
-                )
-              })}
-            </TooltipProvider>
-          </div>
+                </TooltipProvider>
+              </div>
 
-          {/* Right Section */}
-          {user && (
-            <div className="flex items-center gap-2">
-              {/* Notifications - Placeholder for future */}
+              {/* Notifications - Mobile/Tablet */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative hidden sm:flex">
+                    <Button variant="ghost" size="icon" className="relative hidden sm:flex lg:hidden">
                       <Bell className="h-5 w-5" />
                       {/* Badge de notificaciones */}
                       <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
