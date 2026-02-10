@@ -112,12 +112,12 @@ export default function AssignmentsPage() {
               key={assignment.id}
               className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-green-300 overflow-hidden"
             >
-              {/* Header */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-800/20 p-4">
-                <CardTitle className="text-green-900 dark:text-green-100 text-lg mb-2 line-clamp-2">
+              {/* Header con gradiente */}
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-4">
+                <CardTitle className="text-white text-lg mb-2 line-clamp-2">
                   {assignment.title || 'Sin título'}
                 </CardTitle>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300 text-sm">
+                <div className="flex items-center gap-2 text-white/90 text-sm">
                   <BookOpen className="h-4 w-4" />
                   <span className="line-clamp-1">
                     {assignment.curriculumSubject?.name || assignment.subject?.name || 'Sin materia'}

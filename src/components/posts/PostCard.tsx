@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { MessageCircle, Hash, Trash2, Heart, Download, FileText, Star, Calendar, ClipboardList, FolderOpen, MessageSquare, Github, Globe, Code, Users } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { timeAgo } from '@/lib/utils'
@@ -259,6 +259,7 @@ export default function PostCard({ post }: PostCardProps) {
           <div className="flex items-center gap-3">
             <Link to={`/profile/${post.userId}`}>
               <Avatar className="h-10 w-10">
+                <AvatarImage src={post.user?.profileImage} alt={post.user?.name} />
                 <AvatarFallback className="bg-primary/10 text-primary">
                   {post.user ? getInitials(post.user.name) : 'U'}
                 </AvatarFallback>

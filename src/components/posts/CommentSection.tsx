@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { commentService } from '@/services/commentService'
 import { useAuthStore } from '@/stores/authStore'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
@@ -90,6 +90,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       {/* Formulario para nuevo comentario */}
       <div className="flex gap-3">
         <Avatar className="h-8 w-8">
+          <AvatarImage src={user?.profileImage} alt={user?.name} />
           <AvatarFallback className="bg-primary/10 text-primary text-xs">
             {user ? getInitials(user.name) : 'U'}
           </AvatarFallback>
@@ -124,6 +125,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             <div key={comment.id} className="flex gap-3">
               <Link to={`/profile/${comment.userId}`}>
                 <Avatar className="h-8 w-8">
+                  <AvatarImage src={comment.user?.profileImage} alt={comment.user?.name} />
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
                     {comment.user ? getInitials(comment.user.name) : 'U'}
                   </AvatarFallback>

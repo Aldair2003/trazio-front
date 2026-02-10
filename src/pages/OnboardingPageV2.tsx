@@ -67,8 +67,12 @@ export default function OnboardingPageV2() {
     visibility: TeacherVisibility.ALL_CAREER,
   })
 
-  // Materias agrupadas por semestre para el docente
-  const [teacherSubjectsBySemester, setTeacherSubjectsBySemester] = useState<{ [semester: number]: CurriculumSubject[] }>({})
+  // Materias agrupadas por semestre y malla para el docente
+  const [teacherSubjectsBySemester, setTeacherSubjectsBySemester] = useState<{ 
+    [curriculumId: number]: { 
+      [semester: number]: CurriculumSubject[] 
+    } 
+  }>({})
 
   useEffect(() => {
     if (user?.profileCompleted) {
@@ -276,19 +280,22 @@ export default function OnboardingPageV2() {
 
   const loadTeacherSubjects = async () => {
     try {
-      const subjectsBySemester: { [semester: number]: CurriculumSubject[] } = {}
+      const subjectsByCurriculumAndSemester: { 
+        [curriculumId: number]: { 
+          [semester: number]: CurriculumSubject[] 
+        } 
+      } = {}
       
       for (const curriculumId of teacherData.curriculumIds) {
+        subjectsByCurriculumAndSemester[curriculumId] = {}
+        
         for (const semester of teacherData.semesterIds) {
           const subjects = await curriculumService.getSubjectsBySemester(curriculumId, semester)
-          if (!subjectsBySemester[semester]) {
-            subjectsBySemester[semester] = []
-          }
-          subjectsBySemester[semester].push(...subjects)
+          subjectsByCurriculumAndSemester[curriculumId][semester] = subjects
         }
       }
       
-      setTeacherSubjectsBySemester(subjectsBySemester)
+      setTeacherSubjectsBySemester(subjectsByCurriculumAndSemester)
     } catch (error) {
       console.error('Error loading teacher subjects:', error)
     }
@@ -310,12 +317,17 @@ export default function OnboardingPageV2() {
         return
       }
       
-      // Preparar datos - convertir IDs a números
+      // Preparar datos - convertir IDs a números y eliminar duplicados
       const dataToSend: any = {
-        curriculumIds: teacherData.curriculumIds.map(id => Number(id)),
-        subjectIds: teacherData.subjectIds.map(id => Number(id)),
+        curriculumIds: [...new Set(teacherData.curriculumIds.map(id => Number(id)))],
+        subjectIds: [...new Set(teacherData.subjectIds.map(id => Number(id)))], // Eliminar duplicados
         visibility: teacherData.visibility,
       }
+      
+      console.log('=== ENVIANDO DATOS AL BACKEND ===')
+      console.log('Curriculum IDs:', dataToSend.curriculumIds)
+      console.log('Subject IDs (únicos):', dataToSend.subjectIds)
+      console.log('Total materias únicas:', dataToSend.subjectIds.length)
       
       // Solo agregar campos opcionales si tienen valor
       if (teacherData.institutionalEmail && teacherData.institutionalEmail.trim()) {
@@ -771,7 +783,8 @@ export default function OnboardingPageV2() {
               {/* PASO 4: Materias */}
               {teacherStep === 4 && (
                 <TeacherSteps.Step4
-                  subjectsBySemester={teacherSubjectsBySemester}
+                  curriculums={curriculums}
+                  subjectsByCurriculumAndSemester={teacherSubjectsBySemester}
                   selectedSubjectIds={teacherData.subjectIds}
                   onToggleSubject={(subjectId) => {
                     const ids = teacherData.subjectIds

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useState } from 'react'
 import { 
   Curriculum,
   CurriculumSubject,
@@ -17,7 +18,10 @@ import {
   Calendar,
   Eye,
   Sparkles,
-  Lightbulb
+  Lightbulb,
+  Search,
+  BookMarked,
+  GraduationCap
 } from 'lucide-react'
 
 // ========== PASO 1: Contexto Académico ==========
@@ -189,12 +193,42 @@ export function TeacherStep3_Semesters({
   onNext,
   onBack,
 }: Step3Props) {
+  const allSemestersSelected = selectedSemesters.length === totalSemesters
+  
+  const toggleAllSemesters = () => {
+    if (allSemestersSelected) {
+      // Deseleccionar todos
+      selectedSemesters.forEach(semester => onToggleSemester(semester))
+    } else {
+      // Seleccionar todos los que faltan
+      Array.from({ length: totalSemesters }, (_, i) => i + 1).forEach(semester => {
+        if (!selectedSemesters.includes(semester)) {
+          onToggleSemester(semester)
+        }
+      })
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <Calendar className="w-12 h-12 mx-auto text-indigo-600 mb-4" />
         <h2 className="text-2xl font-bold">Semestres</h2>
         <p className="text-gray-600 mt-2">Selecciona los semestres en los que dictas clases</p>
+      </div>
+
+      {/* Botón para seleccionar todos */}
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-gray-600">
+          {selectedSemesters.length} de {totalSemesters} semestres seleccionados
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleAllSemesters}
+        >
+          {allSemestersSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -228,7 +262,7 @@ export function TeacherStep3_Semesters({
           className="flex-1" 
           size="lg"
         >
-          Continuar
+          Continuar ({selectedSemesters.length} semestres)
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
@@ -238,7 +272,12 @@ export function TeacherStep3_Semesters({
 
 // ========== PASO 4: Selección de Materias ==========
 interface Step4Props {
-  subjectsBySemester: { [semester: number]: CurriculumSubject[] }
+  curriculums: Curriculum[]
+  subjectsByCurriculumAndSemester: { 
+    [curriculumId: number]: { 
+      [semester: number]: CurriculumSubject[] 
+    } 
+  }
   selectedSubjectIds: number[]
   onToggleSubject: (subjectId: number) => void
   onNext: () => void
@@ -246,12 +285,46 @@ interface Step4Props {
 }
 
 export function TeacherStep4_Subjects({
-  subjectsBySemester,
+  curriculums,
+  subjectsByCurriculumAndSemester,
   selectedSubjectIds,
   onToggleSubject,
   onNext,
   onBack,
 }: Step4Props) {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Función para seleccionar/deseleccionar todas las materias de un semestre
+  const toggleAllSemesterSubjects = (subjects: CurriculumSubject[]) => {
+    const semesterSubjectIds = subjects.map(s => s.id)
+    const allSelected = semesterSubjectIds.every(id => selectedSubjectIds.includes(id))
+    
+    if (allSelected) {
+      // Deseleccionar todas
+      semesterSubjectIds.forEach(id => {
+        if (selectedSubjectIds.includes(id)) {
+          onToggleSubject(id)
+        }
+      })
+    } else {
+      // Seleccionar todas las que no están seleccionadas
+      semesterSubjectIds.forEach(id => {
+        if (!selectedSubjectIds.includes(id)) {
+          onToggleSubject(id)
+        }
+      })
+    }
+  }
+
+  // Filtrar materias por búsqueda
+  const filterSubjects = (subjects: CurriculumSubject[]) => {
+    if (!searchTerm) return subjects
+    return subjects.filter(subject => 
+      subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subject.code?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -260,34 +333,139 @@ export function TeacherStep4_Subjects({
         <p className="text-gray-600 mt-2">Selecciona las materias que dictas en cada semestre</p>
       </div>
 
-      <div className="space-y-4 max-h-96 overflow-y-auto">
-        {Object.entries(subjectsBySemester).map(([semester, subjects]) => (
-          <Card key={semester} className="p-4">
-            <h3 className="font-semibold text-lg mb-3 text-indigo-600">
-              Semestre {semester}
-            </h3>
-            <div className="space-y-2">
-              {subjects.map((subject) => (
-                <label
-                  key={subject.id}
-                  className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
-                >
-                  <Checkbox
-                    checked={selectedSubjectIds.includes(subject.id)}
-                    onCheckedChange={() => onToggleSubject(subject.id)}
-                  />
-                  <span className="flex-1">{subject.name}</span>
-                  {subject.code && (
-                    <span className="text-sm text-gray-500">{subject.code}</span>
-                  )}
-                </label>
-              ))}
-            </div>
-          </Card>
-        ))}
+      {/* Buscador */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Input
+          type="text"
+          placeholder="Buscar materia por nombre o código..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
       </div>
 
-      <div className="flex gap-4 pt-4">
+      <div className="space-y-6 max-h-[500px] overflow-y-auto">
+        {Object.entries(subjectsByCurriculumAndSemester).map(([curriculumIdStr, semesterData]) => {
+          const curriculumId = Number(curriculumIdStr)
+          // FIX: Convertir ambos a number para comparación correcta
+          const curriculum = curriculums.find(c => Number(c.id) === Number(curriculumId))
+          
+          // Contar materias seleccionadas de esta malla
+          const allSubjectsInCurriculum = Object.values(semesterData).flat()
+          const selectedInCurriculum = allSubjectsInCurriculum.filter(s => selectedSubjectIds.includes(s.id)).length
+          
+          return (
+            <div key={curriculumId} className="border-2 border-indigo-200 rounded-xl p-4 bg-gradient-to-br from-indigo-50 to-white">
+              {/* Header de Malla */}
+              <div className="mb-4 pb-3 border-b-2 border-indigo-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-indigo-700 flex items-center gap-2">
+                      {String(curriculum?.type).toLowerCase() === 'new' ? (
+                        <Sparkles className="w-6 h-6 text-blue-600" />
+                      ) : (
+                        <BookMarked className="w-6 h-6 text-green-600" />
+                      )}
+                      {curriculum?.name || `Malla ${curriculumId}`}
+                    </h2>
+                    <p className="text-sm font-medium mt-1 flex items-center gap-2">
+                      {String(curriculum?.type).toLowerCase() === 'new' ? (
+                        <>
+                          <GraduationCap className="w-4 h-4 text-blue-600" />
+                          <span className="text-blue-600">Malla Repotenciada</span>
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="w-4 h-4 text-green-600" />
+                          <span className="text-green-600">Malla Antigua</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-indigo-700">
+                      {selectedInCurriculum}
+                    </div>
+                    <div className="text-xs text-indigo-600">
+                      materias seleccionadas
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Materias por Semestre */}
+              <div className="space-y-3">
+                {Object.entries(semesterData).map(([semesterStr, subjects]) => {
+                  const filteredSubjects = filterSubjects(subjects)
+                  if (filteredSubjects.length === 0) return null
+
+                  const selectedInSemester = filteredSubjects.filter(s => selectedSubjectIds.includes(s.id)).length
+                  const allSelected = filteredSubjects.every(s => selectedSubjectIds.includes(s.id))
+
+                  return (
+                    <Card key={semesterStr} className="p-4 bg-white shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-lg text-indigo-600 flex items-center gap-2">
+                          <Calendar className="w-5 h-5" />
+                          Semestre {semesterStr}
+                        </h3>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-gray-600">
+                            {selectedInSemester}/{filteredSubjects.length}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleAllSemesterSubjects(filteredSubjects)}
+                            className="text-xs"
+                          >
+                            {allSelected ? 'Deseleccionar todas' : 'Seleccionar todas'}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {filteredSubjects.map((subject) => (
+                          <label
+                            key={subject.id}
+                            className="flex items-center gap-3 p-3 hover:bg-indigo-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <Checkbox
+                              checked={selectedSubjectIds.includes(subject.id)}
+                              onCheckedChange={() => onToggleSubject(subject.id)}
+                            />
+                            <span className="flex-1 font-medium">{subject.name}</span>
+                            {subject.code && (
+                              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                {subject.code}
+                              </span>
+                            )}
+                          </label>
+                        ))}
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Mensaje si no hay resultados */}
+      {searchTerm && Object.values(subjectsByCurriculumAndSemester).every(semesterData => 
+        Object.values(semesterData).flat().filter(s => 
+          s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          s.code?.toLowerCase().includes(searchTerm.toLowerCase())
+        ).length === 0
+      ) && (
+        <div className="text-center py-8 text-gray-500">
+          <Search className="w-12 h-12 mx-auto mb-2 opacity-50" />
+          <p>No se encontraron materias con "{searchTerm}"</p>
+        </div>
+      )}
+
+      <div className="flex gap-4 pt-4 border-t">
         <Button onClick={onBack} variant="outline" size="lg">
           Volver
         </Button>
@@ -297,7 +475,7 @@ export function TeacherStep4_Subjects({
           className="flex-1" 
           size="lg"
         >
-          Continuar
+          Continuar ({selectedSubjectIds.length} materias seleccionadas)
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

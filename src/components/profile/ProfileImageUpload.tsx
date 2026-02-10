@@ -31,7 +31,9 @@ export default function ProfileImageUpload({ currentImage: _currentImage }: Prof
         setUser({ ...user, profileImage: data.profileImage })
       }
       
+      // Invalidar todas las queries de perfil para actualizar la UI
       queryClient.invalidateQueries({ queryKey: ['profile'] })
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
       setUploading(false)
     },
     onError: (error: any) => {
