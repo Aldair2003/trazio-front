@@ -8,7 +8,8 @@ import {
   Bell,
   Settings,
   GraduationCap,
-  Users
+  Users,
+  Home
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -65,18 +66,25 @@ export default function Navbar() {
 
   // Navegación basada en el rol del usuario
   const getNavLinks = () => {
+    // Enlace base al Home para todos los usuarios autenticados
+    const baseLinks = [
+      { path: '/', icon: Home, label: 'Home' },
+    ]
+
     if (user?.role === UserRole.STUDENT) {
       return [
+        ...baseLinks,
         { path: '/mis-materias', icon: BookOpen, label: 'Mis Materias' },
         // { path: '/recursos', icon: FileText, label: 'Recursos' },
       ]
     } else if (user?.role === UserRole.TEACHER) {
       return [
+        ...baseLinks,
         { path: '/mis-clases', icon: GraduationCap, label: 'Mis Clases' },
       ]
     }
     
-    return []
+    return baseLinks
   }
 
   const navLinks = getNavLinks()
