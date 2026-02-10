@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, Hash, Trash2, Heart, Download, FileText, Star, Calendar, ClipboardList, FolderOpen, MessageSquare, Github, Globe, Code, Users } from 'lucide-react'
+import { MessageCircle, Hash, Trash2, Heart, Download, FileText, Star, Calendar, ClipboardList, FolderOpen, MessageSquare, Github, Globe, Code, Users, AlertTriangle, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,14 @@ import { postService } from '@/services/postService'
 import { likeService } from '@/services/likeService'
 import { highlightService } from '@/services/highlightService'
 import { useToast } from '@/hooks/use-toast'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface PostCardProps {
   post: Post
@@ -65,6 +73,7 @@ export default function PostCard({ post }: PostCardProps) {
   const [showComments, setShowComments] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
   const [hasLiked, setHasLiked] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const isOwner = user?.id === post.userId
 
@@ -171,9 +180,16 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   const handleDelete = () => {
-    if (window.confirm('¿Estás seguro de eliminar esta publicación?')) {
-      deleteMutation.mutate()
-    }
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = () => {
+    deleteMutation.mutate()
+    setDeleteDialogOpen(false)
+  }
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false)
   }
 
   // Obtener configuración del tipo de post
@@ -775,6 +791,49 @@ export default function PostCard({ post }: PostCardProps) {
 
         {showComments && <CommentSection postId={post.id} />}
       </CardFooter>
+
+      {/* Modal de confirmación para eliminar publicación */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-destructive/10 rounded-full">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <DialogTitle className="text-xl">Eliminar publicación</DialogTitle>
+            </div>
+            <DialogDescription className="text-base pt-2">
+              ¿Estás seguro de que deseas eliminar esta publicación? Esta acción no se puede deshacer y se eliminarán todos los comentarios y likes asociados.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={cancelDelete}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+              className="w-full sm:w-auto"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                'Eliminar'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

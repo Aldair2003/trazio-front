@@ -8,7 +8,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { timeAgo } from '@/lib/utils'
 import { Link } from 'react-router-dom'
-import { Loader2, Trash2 } from 'lucide-react'
+import { Loader2, Trash2, AlertTriangle } from 'lucide-react'
+import { AxiosError } from 'axios'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface CommentSectionProps {
   postId: number
@@ -20,6 +29,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const queryClient = useQueryClient()
   const [commentContent, setCommentContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null)
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ['comments', postId],
@@ -57,6 +68,14 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         title: 'Comentario eliminado',
       })
     },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      console.error('Error al eliminar comentario:', error)
+      toast({
+        variant: 'destructive',
+        title: 'Error al eliminar',
+        description: error.response?.data?.message || 'No tienes permisos para eliminar este comentario',
+      })
+    },
   })
 
   const handleSubmitComment = () => {
@@ -71,9 +90,21 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   }
 
   const handleDeleteComment = (commentId: number) => {
-    if (window.confirm('¿Eliminar este comentario?')) {
-      deleteCommentMutation.mutate(commentId)
+    setCommentToDelete(commentId)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (commentToDelete !== null) {
+      deleteCommentMutation.mutate(commentToDelete)
+      setDeleteDialogOpen(false)
+      setCommentToDelete(null)
     }
+  }
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false)
+    setCommentToDelete(null)
   }
 
   const getInitials = (name: string) => {
@@ -167,6 +198,49 @@ export default function CommentSection({ postId }: CommentSectionProps) {
           )}
         </div>
       )}
+
+      {/* Modal de confirmación para eliminar comentario */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-destructive/10 rounded-full">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <DialogTitle className="text-xl">Eliminar comentario</DialogTitle>
+            </div>
+            <DialogDescription className="text-base pt-2">
+              ¿Estás seguro de que deseas eliminar este comentario? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={cancelDelete}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteCommentMutation.isPending}
+              className="w-full sm:w-auto"
+            >
+              {deleteCommentMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                'Eliminar'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
