@@ -15,7 +15,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { profileService } from '@/services/profileService'
 import { Loader2, Edit } from 'lucide-react'
-import { useAuthStore } from '@/stores/authStore'
 import { UserRole } from '@/types'
 
 interface EditProfileDialogProps {
@@ -28,7 +27,6 @@ export default function EditProfileDialog({ currentProfile, role }: EditProfileD
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const { user } = useAuthStore()
 
   // Estado para estudiantes
   const [studentData, setStudentData] = useState({

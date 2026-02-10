@@ -83,13 +83,13 @@ export default function SettingsPage() {
     setIsUploadingImage(true)
     try {
       const uploadResult = await uploadService.uploadImage(file)
-      await profileService.updateProfileImage(uploadResult.secureUrl)
+      await profileService.updateProfileImage(uploadResult.url)
       
-      setProfileData(prev => ({ ...prev, profileImage: uploadResult.secureUrl }))
+      setProfileData(prev => ({ ...prev, profileImage: uploadResult.url }))
       
       // Actualizar el store de auth con la nueva imagen
       if (user) {
-        setUser({ ...user, profileImage: uploadResult.secureUrl })
+        setUser({ ...user, profileImage: uploadResult.url })
       }
       
       toast({ title: 'Foto de perfil actualizada' })

@@ -137,9 +137,9 @@ export default function CreatePostDialog() {
 
       // Subir archivo si existe
       if (selectedFile) {
-        const { data: uploadResult, fileType: type } = await uploadService.uploadFile(selectedFile.file)
-        filePath = uploadResult.secureUrl || uploadResult.url
-        fileType = type
+        const uploadResult = await uploadService.uploadFile(selectedFile.file)
+        filePath = uploadResult.url
+        fileType = uploadResult.type
         fileName = selectedFile.file.name
       }
 

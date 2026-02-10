@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { profileService } from '@/services/profileService'
-import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { Camera, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -13,7 +12,7 @@ interface ProfileImageUploadProps {
 const CLOUDINARY_CLOUD_NAME = 'YOUR_CLOUD_NAME' // TODO: Configurar en variables de entorno
 const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET' // TODO: Configurar en variables de entorno
 
-export default function ProfileImageUpload({ currentImage }: ProfileImageUploadProps) {
+export default function ProfileImageUpload({ currentImage: _currentImage }: ProfileImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const { toast } = useToast()
   const queryClient = useQueryClient()

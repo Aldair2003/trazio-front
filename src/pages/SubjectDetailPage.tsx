@@ -22,19 +22,19 @@ export default function SubjectDetailPage() {
 
   const { data: exams } = useQuery({
     queryKey: ['exams', 'subject', subjectId],
-    queryFn: () => examService.getAll({ subjectId: Number(subjectId) }),
+    queryFn: () => examService.getByCurriculumSubject(Number(subjectId)),
     enabled: !!subjectId,
   })
 
   const { data: assignments } = useQuery({
     queryKey: ['assignments', 'subject', subjectId],
-    queryFn: () => assignmentService.getAll({ subjectId: Number(subjectId) }),
+    queryFn: () => assignmentService.getByCurriculumSubject(Number(subjectId)),
     enabled: !!subjectId,
   })
 
   const { data: projects } = useQuery({
     queryKey: ['projects', 'subject', subjectId],
-    queryFn: () => projectService.getAll({ subjectId: Number(subjectId) }),
+    queryFn: () => projectService.getByCurriculumSubject(Number(subjectId)),
     enabled: !!subjectId,
   })
 
@@ -83,7 +83,7 @@ export default function SubjectDetailPage() {
         </div>
         {exams && exams.length > 0 ? (
           <div className="grid gap-4">
-            {exams.map((exam) => (
+            {exams.map((exam: any) => (
               <Card key={exam.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
@@ -119,7 +119,7 @@ export default function SubjectDetailPage() {
         </div>
         {assignments && assignments.length > 0 ? (
           <div className="grid gap-4">
-            {assignments.map((assignment) => (
+            {assignments.map((assignment: any) => (
               <Card key={assignment.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
@@ -155,7 +155,7 @@ export default function SubjectDetailPage() {
         </div>
         {projects && projects.length > 0 ? (
           <div className="grid gap-4">
-            {projects.map((project) => (
+            {projects.map((project: any) => (
               <Card key={project.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">

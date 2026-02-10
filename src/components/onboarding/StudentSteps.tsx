@@ -1,16 +1,10 @@
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { 
   Curriculum, 
-  CurriculumSubject,
-  AcademicStatus,
-  TrazioGoal,
-  ACADEMIC_INTERESTS 
+  CurriculumSubject
 } from '@/types'
-import { CheckCircle2, BookOpen, Calendar, Sparkles, Target, User, ArrowRight } from 'lucide-react'
+import { CheckCircle2, BookOpen, Calendar, Sparkles, ArrowRight } from 'lucide-react'
 
 // ========== PASO 1: Selección de Malla ==========
 interface Step1Props {

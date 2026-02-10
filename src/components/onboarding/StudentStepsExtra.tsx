@@ -1,22 +1,17 @@
-import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { 
   CurriculumSubject,
-  AcademicStatus,
-  TrazioGoal,
-  ACADEMIC_INTERESTS 
+  AcademicStatus
 } from '@/types'
 import { 
   AlertCircle, 
   Calendar, 
   User, 
-  Sparkles, 
-  Target,
+  Sparkles,
   ArrowRight,
   CheckCircle2,
   Lightbulb
